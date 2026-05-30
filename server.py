@@ -1,15 +1,23 @@
 import socket
+import os
 
-server = socket.socket()
-server.bind(("0.0.0.0", 4059))
-server.listen(1)
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 4059))
 
-print("Waiting...")
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind((HOST, PORT))
+server.listen(5)
 
-conn, addr = server.accept()
+print(f"Server running on {HOST}:{PORT}")
 
-msg = conn.recv(1024).decode()
+while True:
+    conn, addr = server.accept()
+    print("Connected:", addr)
 
-print("Message:", msg)
+    data = conn.recv(1024)
 
-conn.close()
+    if data:
+        print("Message:", data.decode(errors="ignore"))
+        conn.send(b"OK")
+
+    conn.close()
